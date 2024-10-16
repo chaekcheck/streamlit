@@ -2,7 +2,7 @@ import streamlit as st
 
 def app():
     st.header("📕 책 등록하기", divider="rainbow")
-    st.caption("보유한 책의 이름이 맞는지 확인해 주세요.")
+    st.caption("책의 제목과 저자가 맞는지 확인해주세요.")
 
     # OCR로 인식된 책 정보가 있는지 확인하고 없으면 경고 메시지 표시
     if 'detected_books' not in st.session_state:
