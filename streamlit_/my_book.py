@@ -21,7 +21,7 @@ def app():
     cursor = connection.cursor()
 
     # 책 목록 쿼리 실행
-    query = "SELECT title, author FROM sample_user"
+    query = "SELECT b.title AS 책제목, b.author AS 저자 FROM tb_user_books ub JOIN tb_book b ON ub.book_id = b.id"
     cursor.execute(query)
     rows = cursor.fetchall()
 
@@ -32,10 +32,10 @@ def app():
         st.session_state.selected_books = []
 
     # 데이터프레임과 체크박스 표시
-    st.write("보유한 책을 선택하세요:")
+    st.write("책을 선택하면 비슷한 책을 추천해드려요")
     for index, row in df.iterrows():
         # 각 책에 대해 체크박스 생성
-        if st.checkbox(f"{row['Title']} - {row['Author']}", key=f"book_{index}"):
+        if st.checkbox(f"{row['Title']} | {row['Author']}", key=f"book_{index}"):
             if row['Title'] not in st.session_state.selected_books:
                 st.session_state.selected_books.append(row['Title'])
         else:
@@ -59,10 +59,13 @@ def app():
 
     st.caption("어떤 작업을 원하시나요?")
 
-    # 추천받기 버튼 클릭 시 추천 페이지로 이동
+
     if st.button('추천받기', use_container_width=True):
         st.session_state.page = 'recommend_book'
         st.experimental_rerun()  # 페이지 이동
+
+    if st.button('책 등록하기', use_container_width=True):
+        st.session_state.page = 'pic_upload'
 
     cursor.close()
     connection.close()
