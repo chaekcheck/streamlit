@@ -21,7 +21,7 @@ def app():
     cursor = connection.cursor()
 
     # 책 목록 쿼리 실행
-    query = "SELECT title, author FROM sample_user"
+    query = "SELECT b.title AS 책제목, b.author AS 저자 FROM tb_user_books ub JOIN tb_book b ON ub.book_id = b.id"
     cursor.execute(query)
     rows = cursor.fetchall()
 
@@ -31,38 +31,33 @@ def app():
     if 'selected_books' not in st.session_state:
         st.session_state.selected_books = []
 
-    # 데이터프레임과 체크박스 표시
-    st.write("보유한 책을 선택하세요:")
+    # 체크박스와 책 목록을 표시
+    st.write("선택한 도서를 기반으로 추천해드려요")
     for index, row in df.iterrows():
         # 각 책에 대해 체크박스 생성
-        if st.checkbox(f"{row['Title']} - {row['Author']}", key=f"book_{index}"):
+        if st.checkbox(f"{row['Title']} | {row['Author']}", key=f"book_{index}"):
             if row['Title'] not in st.session_state.selected_books:
                 st.session_state.selected_books.append(row['Title'])
         else:
             if row['Title'] in st.session_state.selected_books:
                 st.session_state.selected_books.remove(row['Title'])
 
-    st.subheader("선택한 책 목록")
-    st.write(st.session_state.selected_books)
 
-    # 책 추가 로직: 더보기 버튼
-    if 'book_limit' not in st.session_state:
-        st.session_state.book_limit = 10  # 초기에 10권만 표시
-
-    # 현재 보여줄 데이터의 최대 수 계산
-    max_display = min(st.session_state.book_limit, len(df))
-    st.dataframe(df[:max_display])  # 현재 책 수에 따라 데이터프레임 표시
-
-    if st.session_state.book_limit < len(df):
-        if st.button('더보기', use_container_width=True):
-            st.session_state.book_limit += 5  # 5권씩 더 보기
-
-    st.caption("어떤 작업을 원하시나요?")
-
-    # 추천받기 버튼 클릭 시 추천 페이지로 이동
+    # 추천받기 버튼 클릭 시 recommend_book 페이지로 이동
     if st.button('추천받기', use_container_width=True):
-        st.session_state.page = 'recommend_book'
-        st.experimental_rerun()  # 페이지 이동
+        if st.session_state.selected_books:
+            st.session_state.page = 'recommend_book'
+            st.experimental_rerun()  # 페이지 이동
+        else:
+            st.warning("추천을 받기 위해서는 책을 하나 이상 선택해주세요.")
+
+    # 책 등록하기 버튼
+    if st.button('책 등록하기', use_container_width=True):
+        st.session_state.page = 'pic_upload'
 
     cursor.close()
     connection.close()
+
+# Streamlit app execution
+if __name__ == '__main__':
+    app()
