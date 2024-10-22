@@ -6,7 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 
 def app():
     st.header("📚책쳌(Chaek Check)", divider="rainbow")
-    st.subheader("나의 서재")
+    st.markdown("# 나의 서재")
 
     dotenv_file = find_dotenv()
     load_dotenv(dotenv_file)
@@ -39,7 +39,7 @@ def app():
         st.session_state.selected_books = []
 
     # 체크박스와 책 목록을 표시
-    st.write("선택한 도서를 기반으로 책을 추천해드려요")
+    st.caption("선택한 도서를 기반으로 책을 추천해드려요.")
     for index, row in df.iterrows():
         # 각 책에 대해 체크박스 생성
         if st.checkbox(f"{row['Title']} | {row['Author']}", key=f"book_{index}"):
@@ -50,7 +50,8 @@ def app():
                 st.session_state.selected_books.remove(row['Title'])
 
     # MMR 파라미터
-    mmr_alpha = st.slider("Select a value", min_value=0.5, max_value=1.0, value=0.75, step=0.05)
+    st.subheader("얼마나 새로운 책을 만나고 싶으세요?")
+    mmr_alpha = st.slider("숫자가 작을수록 다양한 종류의 책을 만날 수 있어요.", min_value=0.5, max_value=1.0, value=0.75, step=0.05)
     st.session_state.mmr_alpha = mmr_alpha
 
     # 추천받기 버튼 클릭 시 recommend_book 페이지로 이동

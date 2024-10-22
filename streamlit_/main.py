@@ -19,7 +19,7 @@ with st.sidebar:
     st.session_state.page = option_menu(
         menu_title="My Book",  # 메뉴 제목
         options=["my_book", "pic_upload", "enroll_book", "recommend_book"],  # 메뉴 옵션
-        icons=["book", "pencil", "image", "star"],  # 아이콘 (선택 사항)
+        icons=["book", "image", "pencil", "star"],  # 아이콘 (선택 사항)
         menu_icon="cast",  # 메뉴 아이콘 (선택 사항)
         default_index=["my_book", "pic_upload", "enroll_book", "recommend_book"].index(st.session_state.page),  # 기본 선택 인덱스
     )
