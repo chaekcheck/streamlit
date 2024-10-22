@@ -64,6 +64,7 @@ def app():
     # 책 등록하기 버튼
     if st.button('책 등록하기', use_container_width=True):
         st.session_state.page = 'pic_upload'
+        st.rerun()  # 페이지 이동
 
     # 삭제하기 버튼을 눌렀을 때 선택된 책을 삭제
     if st.button('삭제하기',type="primary", use_container_width=True):
