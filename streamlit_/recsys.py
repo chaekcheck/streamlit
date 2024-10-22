@@ -5,18 +5,49 @@ from scipy.sparse import load_npz
 import pandas as pd
 import numpy as np
 import math
+import pymysql
+
+import os
+from dotenv import load_dotenv, find_dotenv
 
 
 class Recsys:
     def __init__(self, df_path, tfidf_matrix_path) -> None:
-        self.df = pd.read_csv(df_path, index_col=0)
+
+        def get_db_connection():
+            return pymysql.connect(
+            host=os.environ["a_host"],
+            port=int(os.environ["a_port"]),
+            database=os.environ["a_database"],
+            user=os.environ["a_user"],
+            password=os.environ["a_password"],
+            charset=os.environ['charset']
+        )
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM tb_book;")
+            result = cursor.fetchall()  # 모든 결과 가져오기
+            columns = [desc[0] for desc in cursor.description]  # 컬럼명 가져오기
+
+        # 결과를 DataFrame으로 변환
+        self.df = pd.DataFrame(result, columns=columns)
+        self.df.set_index('id', inplace=True)
         self.tfidf_matrix = load_npz(tfidf_matrix_path)
-        return
+        
 
     def get_related_books(self, q_book, k1=2000, k2=10, alpha=0.5):
         # $$$ 여기서 예외처리 필요
+
+        if # 여기부터 수정해야합니다.
+        try:
+            q_idx = self.df[self.df['title'] == q_book].index[0]
+        except:
+            return pd.read_csv('replace_books.csv', index_col=0)
         
-        q_idx = self.df[self.df['title'] == q_book].index[0]
+
         cosine_sim_1 = cosine_similarity(self.tfidf_matrix[q_idx], self.tfidf_matrix).flatten()
 
         # 유사도 top_k1 인덱스들
@@ -55,9 +86,9 @@ class Recsys:
                     recommended_indexes.append(i)
         
         # 추천 결과 반환
-        recommended_books = df_top_k1.iloc[recommended_indexes].copy().reset_index()
+        recommended_books = df_top_k1.iloc[recommended_indexes].copy()
         recommended_books['similarity'] = [sim_scores[i] for i in recommended_indexes]
-        return recommended_books[['title', '저자']]
+        return recommended_books[['title', 'author']]
     
     def recommend_books(self, q_book_list, k1=2000, k2=10, alpha=0.7):
         n = len(q_book_list)
@@ -65,11 +96,13 @@ class Recsys:
 
         results = []
         for q_book in q_book_list:
-            print(f"'{q_book}'과 비슷한 책 찾는 중")
+            print(f"'{q_book}'과 유사한 책 찾는 중")
             result = self.get_related_books(q_book, k1=k1, k2=k2, alpha=alpha)[:bpk]
             results.append(result)
         # print(results)
-        return pd.concat(results).iloc[:k2, :]
+        rc_df = pd.concat(results).iloc[:k2, :].reset_index(drop=True)
+        rc_df.index = rc_df.index + 1
+        return rc_df
 
 
 if __name__=='__main__':
