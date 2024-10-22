@@ -1,14 +1,5 @@
-from ocrMain import get_titles
-
 import streamlit as st
 import asyncio
-from PIL import Image
-
-
-async def long_running_task():
-    for i in range(100):
-        st.write(f"Working on step {i+1}...")
-        await asyncio.sleep(1)  # 비동기적으로 대기
 
 
 def app():
@@ -42,14 +33,9 @@ def app():
             #     {"title": "The Little Prince", "author": "Antoine de Saint-Exupéry"},
             #     {"title": "1984", "author": "George Orwell"}
             # ]
-            detected_books = get_titles(Image.open(uploaded_pic))
-            st.session_state.detected_books = detected_books
-            # st.session_state.page = 'enroll_book'
-            # st.write(detected_books)
+            st.session_state.uploaded_pic = uploaded_pic
+            st.session_state.page = 'enroll_book'
         else:
             st.warning('이미지를 업로드하세요!')
 
-    if st.button('Run task'):
-        asyncio.run(long_running_task())
-        # asyncio.create_task(long_running_task())
 

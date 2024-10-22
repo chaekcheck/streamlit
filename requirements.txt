@@ -8,3 +8,7 @@ pillow
 ultralytics
 transformers
 unicodedata2
+
+scikit-learn
+python-dotenv
+pymysql

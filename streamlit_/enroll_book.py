@@ -1,8 +1,11 @@
+from ocrMain import get_titles
+
 import streamlit as st
 import os
 from dotenv import load_dotenv, find_dotenv
 import pymysql
 import datetime
+from PIL import Image
 
 dotenv_file = find_dotenv()
 load_dotenv(dotenv_file)
@@ -24,11 +27,12 @@ def app():
     st.header("📕 책 등록하기", divider="rainbow")
     st.caption("인식된 책 제목이 맞는지 확인해주세요.")
 
-    if 'detected_books' not in st.session_state:
+    if 'uploaded_pic' not in st.session_state:
         st.warning("책 정보가 없습니다. 먼저 책 사진을 업로드하세요.")
         return
 
-    detected_books = st.session_state.detected_books  # 이전 페이지에서 가져온 책 정보
+    # 이전 페이지에서 가져온 책 정보
+    detected_books = get_titles(Image.open(st.session_state.uploaded_pic))
 
     edited_books = []
     st.subheader("인식된 책 정보")

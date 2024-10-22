@@ -49,12 +49,15 @@ def app():
             if row['Title'] in st.session_state.selected_books:
                 st.session_state.selected_books.remove(row['Title'])
 
+    # MMR 파라미터
+    mmr_alpha = st.slider("Select a value", min_value=0.5, max_value=1.0, value=0.75, step=0.05)
+    st.session_state.mmr_alpha = mmr_alpha
 
     # 추천받기 버튼 클릭 시 recommend_book 페이지로 이동
     if st.button('추천받기', use_container_width=True):
         if st.session_state.selected_books:
             st.session_state.page = 'recommend_book'
-            st.experimental_rerun()  # 페이지 이동
+            # st.experimental_rerun()  # 페이지 이동
         else:
             st.warning("추천을 받기 위해서는 책을 하나 이상 선택해주세요.")
 

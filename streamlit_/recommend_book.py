@@ -1,3 +1,5 @@
+from recsys import Recsys
+
 import streamlit as st
 import pymysql
 import pandas as pd
@@ -9,9 +11,20 @@ def app():
     selected_books = st.session_state.get('selected_books', [])
 
     if selected_books:
-        st.write("선택한 책 목록:")
-        for book in selected_books:
-            st.write(f"- {book}")
+        st.write("책 추천")
+
+        # $$$ csv -> DB로 바꿔야 함
+        df_path = r'D:\python_project\chaekchecklab\data\emb_value.csv'
+        tfidf_matrix_path = r'D:\python_project\chaekchecklab\data\tfidf_matrix.npz'
+        recsys = Recsys(df_path, tfidf_matrix_path)
+        results = recsys.recommend_books(selected_books, alpha=st.session_state.mmr_alpha)
+
+        # for book in results:
+        #     st.write(f"- {book}")
+        st.dataframe(results)
+
+        # 추천 도서 표시
+        st.write(*st.session_state.selected_books)
     else:
         st.write("선택한 책이 없습니다.")
   
@@ -30,14 +43,12 @@ def app():
     cursor = connection.cursor()
 
     # 샘플 추천 도서 쿼리 (추천 로직 나중에 추가 예정)
-    query = "SELECT title, author FROM sample_user LIMIT 10"
-    cursor.execute(query)
-    rows = cursor.fetchall()
+    # query = "SELECT title, author FROM tb_user_books LIMIT 10"
+    # cursor.execute(query)
+    # rows = cursor.fetchall()
 
-    df = pd.DataFrame(rows, columns=['Title', 'Author'])
+    # df = pd.DataFrame(rows, columns=['Title', 'Author'])
 
-    # 추천 도서 표시
-    st.dataframe(df)
 
     # 샘플 데이터로 책 두께 비교 그래프
     st.subheader("책 두께 비교")
