@@ -15,6 +15,7 @@ class Recsys:
 
     def get_related_books(self, q_book, k1=2000, k2=10, alpha=0.5):
         # $$$ 여기서 예외처리 필요
+        
         q_idx = self.df[self.df['title'] == q_book].index[0]
         cosine_sim_1 = cosine_similarity(self.tfidf_matrix[q_idx], self.tfidf_matrix).flatten()
 
