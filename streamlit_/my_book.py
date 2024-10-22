@@ -1,29 +1,36 @@
 import streamlit as st
 import pandas as pd
 import pymysql
+import os
+from dotenv import load_dotenv, find_dotenv
 
 def app():
     st.header("📚책쳌(Chaek Check)", divider="rainbow")
     st.subheader("나의 서재")
 
+    dotenv_file = find_dotenv()
+    load_dotenv(dotenv_file)
+
     # 데이터베이스 연결 함수
     def get_db_connection():
         return pymysql.connect(
-            host='13.124.235.119',
-            port=3307,
-            user='root',
-            passwd='cheakcheck',
-            database='CKCKDB',
-            charset='utf8mb4'
-        )
+        host=os.environ["a_host"],
+        port=int(os.environ["a_port"]),
+        database=os.environ["a_database"],
+        user=os.environ["a_user"],
+        password=os.environ["a_password"],
+        charset=os.environ['charset']
+    )
 
-    connection = get_db_connection()
-    cursor = connection.cursor()
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
     # 책 목록 쿼리 실행
-    query = "SELECT b.title AS 책제목, b.author AS 저자 FROM tb_user_books ub JOIN tb_book b ON ub.book_id = b.id"
-    cursor.execute(query)
-    rows = cursor.fetchall()
+
+    with conn.cursor() as cursor:
+        query = "SELECT b.title AS 책제목, b.author AS 저자 FROM tb_user_books ub JOIN tb_book b ON ub.book_id = b.id"
+        cursor.execute(query)
+        rows = cursor.fetchall()
 
     df = pd.DataFrame(rows, columns=['Title', 'Author'])
 
@@ -32,7 +39,7 @@ def app():
         st.session_state.selected_books = []
 
     # 체크박스와 책 목록을 표시
-    st.write("선택한 도서를 기반으로 추천해드려요")
+    st.write("선택한 도서를 기반으로 책을 추천해드려요")
     for index, row in df.iterrows():
         # 각 책에 대해 체크박스 생성
         if st.checkbox(f"{row['Title']} | {row['Author']}", key=f"book_{index}"):
@@ -55,8 +62,28 @@ def app():
     if st.button('책 등록하기', use_container_width=True):
         st.session_state.page = 'pic_upload'
 
-    cursor.close()
-    connection.close()
+    # 삭제하기 버튼을 눌렀을 때 선택된 책을 삭제
+    if st.button('삭제하기',type="primary", use_container_width=True):
+        if st.session_state.selected_books:
+            # 데이터베이스 연결
+            with conn.cursor() as cursor:
+                for title in st.session_state.selected_books:
+                    # 책 제목을 이용해 book_id 조회
+                    cursor.execute("SELECT id FROM tb_book WHERE title = %s", (title,))
+                    result = cursor.fetchone()
+                    
+                    if result:  # book_id가 존재할 경우
+                        book_id = result[0]
+                        # tb_user_books에서 삭제
+                        cursor.execute("DELETE FROM tb_user_books WHERE book_id = %s", (book_id,))
+                
+                conn.commit()
+            
+            st.success("선택한 책들이 삭제되었습니다.")
+            st.session_state.selected_books = []  # 선택된 책 목록 초기화
+            st.rerun()
+        else:
+            st.warning("삭제할 책을 선택해주세요.")
 
 # Streamlit app execution
 if __name__ == '__main__':
