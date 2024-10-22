@@ -57,7 +57,7 @@ def app():
     if st.button('추천받기', use_container_width=True):
         if st.session_state.selected_books:
             st.session_state.page = 'recommend_book'
-            # st.experimental_rerun()  # 페이지 이동
+            st.rerun()  # 페이지 이동
         else:
             st.warning("추천을 받기 위해서는 책을 하나 이상 선택해주세요.")
 
