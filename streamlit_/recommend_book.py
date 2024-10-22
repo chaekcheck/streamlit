@@ -40,7 +40,7 @@ def app():
 
                 df = pd.DataFrame(result, columns=columns)
 
-            tfidf_matrix_path = "C:\\Users\\nunic\\Desktop\\workspace\\gamnyam_package\\study\\project_PJT\\3_책쳌\\web\\streamlit\\streamlit_\\tfidf_matrix.npz"
+            tfidf_matrix_path = r"D:\python_project\chaekchecklab\data\tfidf_matrix.npz"
             recsys = Recsys(df, tfidf_matrix_path)
             results = recsys.recommend_books(selected_books, alpha=st.session_state.mmr_alpha)
 

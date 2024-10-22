@@ -34,7 +34,9 @@ def app():
             #     {"title": "1984", "author": "George Orwell"}
             # ]
             st.session_state.uploaded_pic = uploaded_pic
+            st.session_state.book_detect = True
             st.session_state.page = 'enroll_book'
+            st.rerun()
         else:
             st.warning('이미지를 업로드하세요!')
 

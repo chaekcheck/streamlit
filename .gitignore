@@ -3,6 +3,7 @@
 # yolo
 *.pt
 # ignore
+test.ipynb
 .env
 # datasets
 data/

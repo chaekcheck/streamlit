@@ -20,7 +20,7 @@ def get_titles(image):
 
     total_st_time = time.time()
     # $$$ for test
-    for i, img in enumerate(cropped_img_list[:5]):
+    for i, img in enumerate(cropped_img_list[:1]):
         print(i)
         st_time = time.time()
 

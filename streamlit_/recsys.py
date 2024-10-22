@@ -12,7 +12,7 @@ from dotenv import load_dotenv, find_dotenv
 
 
 class Recsys:
-    def __init__(self, df_path, tfidf_matrix_path) -> None:
+    def __init__(self, df_path, tfidf_matrix_path, replace_books_path=r'D:\python_project\chaekchecklab\data\replace_books.csv') -> None:
 
         def get_db_connection():
             return pymysql.connect(
@@ -36,18 +36,17 @@ class Recsys:
         self.df = pd.DataFrame(result, columns=columns)
         self.df.set_index('id', inplace=True)
         self.tfidf_matrix = load_npz(tfidf_matrix_path)
+        self.df_replace_books = pd.read_csv(replace_books_path, index_col=0)
         
 
     def get_related_books(self, q_book, k1=2000, k2=10, alpha=0.5):
-        # $$$ 여기서 예외처리 필요
 
-        if # 여기부터 수정해야합니다.
-        try:
-            q_idx = self.df[self.df['title'] == q_book].index[0]
-        except:
-            return pd.read_csv('replace_books.csv', index_col=0)
+        q_book_row = self.df[self.df['title'] == q_book]
+        # print(q_book_row.columns)
+        if q_book_row.iloc[0].categories == 'temp':
+            return self.df_replace_books
         
-
+        q_idx = q_book_row.index[0]
         cosine_sim_1 = cosine_similarity(self.tfidf_matrix[q_idx], self.tfidf_matrix).flatten()
 
         # 유사도 top_k1 인덱스들

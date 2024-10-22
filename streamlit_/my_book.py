@@ -57,13 +57,14 @@ def app():
     if st.button('추천받기', use_container_width=True):
         if st.session_state.selected_books:
             st.session_state.page = 'recommend_book'
-            # st.experimental_rerun()  # 페이지 이동
+            st.rerun()  # 페이지 이동
         else:
             st.warning("추천을 받기 위해서는 책을 하나 이상 선택해주세요.")
 
     # 책 등록하기 버튼
     if st.button('책 등록하기', use_container_width=True):
         st.session_state.page = 'pic_upload'
+        st.rerun()  # 페이지 이동
 
     # 삭제하기 버튼을 눌렀을 때 선택된 책을 삭제
     if st.button('삭제하기',type="primary", use_container_width=True):
