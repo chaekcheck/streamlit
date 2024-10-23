@@ -1,6 +1,9 @@
+from ocrMain import get_titles
+
 import streamlit as st
-import os
 from dotenv import load_dotenv, find_dotenv
+from PIL import Image
+import os
 import pymysql
 import datetime
 
@@ -33,15 +36,18 @@ def app():
     st.header("📕 책 등록하기", divider="rainbow")
     st.caption("인식된 책 제목이 맞는지 확인해주세요.")
 
-    if 'detected_books' not in st.session_state:
+    if 'uploaded_pic' not in st.session_state:
         st.warning("책 정보가 없습니다. 먼저 책 사진을 업로드하세요.")
         return
 
-    detected_books = st.session_state.detected_books  # 이전 페이지에서 가져온 책 정보
-
+    # 이전 페이지에서 가져온 책 정보
+    if st.session_state.need_detect:
+        st.session_state.detected_books = get_titles(Image.open(st.session_state.uploaded_pic))
+        st.session_state.need_detect = False
+    
     edited_books = []
     st.subheader("인식된 책 정보")
-    for idx, book in enumerate(detected_books):
+    for idx, book in enumerate(st.session_state.detected_books):
         with st.expander(f"책 {idx + 1}: {book}"):
             new_title = st.text_input(f"책 제목 {idx + 1}", value=book)
             edited_books.append({"title": new_title})
@@ -49,6 +55,8 @@ def app():
     if st.button('책 등록하기', type="primary", use_container_width=True):
         st.session_state.edited_books = edited_books
         add_books_to_shelf(edited_books)
+        st.rerun()
+        # st.session_state.detected_books = []
 
     # 이미 있는 책들에 대해 알림 메시지
     if st.session_state.existing_books:
@@ -85,6 +93,7 @@ def app():
 
     if st.button('나의 서재 확인하기', use_container_width=True):
         st.session_state.page = 'my_book'
+        st.rerun()
 
 
 def generate_unique_url(counter):

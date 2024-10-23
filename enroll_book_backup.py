@@ -32,9 +32,9 @@ def app():
         return
 
     # 이전 페이지에서 가져온 책 정보
-    if st.session_state.book_detect:
+    if st.session_state.need_detect:
         st.session_state.detected_books = get_titles(Image.open(st.session_state.uploaded_pic))
-        st.session_state.book_detect = False
+        st.session_state.need_detect = False
 
     edited_books = []
     st.subheader("인식된 책 정보")

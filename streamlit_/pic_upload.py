@@ -37,7 +37,7 @@ def app():
             #     {"title": "1984", "author": "George Orwell"}
             # ]
             st.session_state.uploaded_pic = uploaded_pic
-            st.session_state.book_detect = True
+            st.session_state.need_detect = True
             st.session_state.page = 'enroll_book'
             st.rerun()
         else:
