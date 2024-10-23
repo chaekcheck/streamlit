@@ -7,7 +7,7 @@ def app():
     st.caption("보유한 책을 온라인 서재에 등록하세요.")
 
     # Image input box
-    uploaded_pic = st.file_uploader("책 사진을 업로드하세요", type=["jpg", "png", "jpeg"])
+    uploaded_pic = st.file_uploader("책 사진을 업로드하세요.", type=["jpg", "png", "jpeg"])
 
     # 업로드한 책 목록
     # if uploaded_pic is not None:
