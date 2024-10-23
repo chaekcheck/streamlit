@@ -30,7 +30,7 @@ def app():
         selected_books = st.session_state.get('selected_books', [])
 
         if selected_books:
-            st.subheader('❤️추천 책 목록❤️')
+            st.subheader('🌈추천 책 목록')
 
             # DB에서 데이터 가져오기
             with conn.cursor() as cursor:
@@ -40,7 +40,7 @@ def app():
 
                 df = pd.DataFrame(result, columns=columns)
 
-            tfidf_matrix_path = r"D:\python_project\chaekchecklab\data\tfidf_matrix.npz"
+            tfidf_matrix_path = r"tfidf_matrix.npz"
             recsys = Recsys(df, tfidf_matrix_path)
             results = recsys.recommend_books(selected_books, alpha=st.session_state.mmr_alpha)
 
