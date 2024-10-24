@@ -33,6 +33,9 @@ def app():
     if 'missing_books' not in st.session_state:
         st.session_state.missing_books = []
 
+    if 'enroll_books' not in st.session_state:
+        st.session_state.enroll_books = []
+
     st.header("📕 책 등록하기", divider="rainbow")
     st.caption("인식된 책 제목이 맞는지 확인해주세요.")
 
@@ -52,10 +55,10 @@ def app():
             new_title = st.text_input(f"책 제목 {idx + 1}", value=book)
             edited_books.append({"title": new_title})
 
-    if st.button('책 등록하기', type="primary", use_container_width=True):
+    if st.button('책 확인하기', use_container_width=True):
         st.session_state.edited_books = edited_books
         add_books_to_shelf(edited_books)
-        st.rerun()
+        # st.rerun()
         # st.session_state.detected_books = []
 
     # 이미 있는 책들에 대해 알림 메시지
@@ -79,17 +82,26 @@ def app():
 
         # 버튼 클릭 시 콜백 함수 실행
         if st.session_state.choice == "예":
-            st.button("확인", on_click=on_yes)
+            st.session_state.message = 'yes'
+            # st.button("확인", on_click=on_yes)
         else:
-            st.button("확인", on_click=on_no)
-    
-    if st.session_state.message == 'yes':
-        st.success("책 등록이 완료되었습니다. chaek chek~!")
-        st.session_state.missing_books = []
-        st.session_state.message = ''
-    elif st.session_state.message == 'no':
-        st.info('찾을 수 없는 책은 제외하고 책 등록이 완료되었습니다.')
-        st.session_state.message = ''
+            st.session_state.message = 'no'
+            # st.button("확인", on_click=on_no)
+
+    if st.button('책 등록하기', type="primary", use_container_width=True):
+        if not st.session_state.edited_books:
+            st.info(f"책 확인을 먼저 해주세요^^")
+        else:
+            enroll_to_db()
+
+
+    # if st.session_state.message == 'no':
+    #     st.info('찾을 수 없는 책은 제외하고 책 등록이 완료되었습니다.')
+    #     st.session_state.message = ''
+    # elif st.session_state.message == 'yes':
+    #     st.success("책 등록이 완료되었습니다. chaek chek~!")
+    #     st.session_state.missing_books = []
+    #     st.session_state.message = ''
 
     if st.button('나의 서재 확인하기', use_container_width=True):
         st.session_state.page = 'my_book'
@@ -104,6 +116,28 @@ def generate_unique_url(counter):
 
 
 # 콜백 함수 정의
+def enroll_to_db():
+    with conn.cursor() as cursor:
+        if st.session_state.message == "yes":
+            for idx, title in enumerate(st.session_state.missing_books):
+                url = generate_unique_url(idx)
+                cursor.execute(
+                    "INSERT INTO tb_book (title, categories, url) VALUES (%s, %s, %s)",
+                    (title, "temp", url)
+                )
+                book_id = cursor.lastrowid
+                cursor.execute("INSERT INTO tb_user_books (book_id) VALUES (%s)", (book_id,))
+        
+        for idx, book_id in enumerate(st.session_state.enroll_books):
+            cursor.execute("INSERT INTO tb_user_books (book_id) VALUES (%s)", (book_id,))
+        conn.commit()
+    
+    st.success("책 등록이 완료되었습니다. chaek chek~!")
+    st.session_state.missing_books = []
+    st.session_state.existing_books = []
+    st.session_state.enroll_books = []
+    return
+
 def on_yes():
     # 예 선택 시 책을 DB에 추가하는 로직
     with conn.cursor() as cursor:
@@ -117,8 +151,6 @@ def on_yes():
             cursor.execute("INSERT INTO tb_user_books (book_id) VALUES (%s)", (book_id,))
         conn.commit()
     st.session_state.message = "yes"
-
-
 def on_no():
     # 아니오 선택 시 표시할 메시지
     st.session_state.message = "no"
@@ -145,12 +177,14 @@ def add_books_to_shelf(books):
                 book_id = result[0]
                 cursor.execute("SELECT * FROM tb_user_books WHERE book_id = %s", (book_id,))
                 if cursor.fetchone() is None:
-                    cursor.execute("INSERT INTO tb_user_books (book_id) VALUES (%s)", (book_id,))
+                    # cursor.execute("INSERT INTO tb_user_books (book_id) VALUES (%s)", (book_id,))
+                    st.session_state.enroll_books.append(book_id)
                 else:
                     st.session_state.existing_books.append(title)  # 이미 있는 책은 리스트에 추가
             else:
                 st.session_state.missing_books.append(title)  # 없는 책은 리스트에 추가
-
+    
+    st.success("책 확인이 완료되었어요~")
 
 # # 버튼 클릭 후 메시지 표시
 # if st.session_state.message:
