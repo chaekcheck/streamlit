@@ -6,7 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 
 def app():
     st.header("📚책쳌(Chaek Check)", divider="rainbow")
-    st.markdown("# 나의 서재")
+    st.markdown("# 🚀나의 서재")
 
     dotenv_file = find_dotenv()
     load_dotenv(dotenv_file)
@@ -49,19 +49,6 @@ def app():
             if row['Title'] in st.session_state.selected_books:
                 st.session_state.selected_books.remove(row['Title'])
 
-    # MMR 파라미터
-    st.subheader("얼마나 새로운 책을 만나고 싶으세요?")
-    mmr_alpha = st.slider("숫자가 작을수록 다양한 종류의 책을 만날 수 있어요.", min_value=0.5, max_value=1.0, value=0.75, step=0.05)
-    st.session_state.mmr_alpha = mmr_alpha
-
-    # 추천받기 버튼 클릭 시 recommend_book 페이지로 이동
-    if st.button('추천받기', use_container_width=True):
-        if st.session_state.selected_books:
-            st.session_state.page = 'recommend_book'
-            st.rerun()  # 페이지 이동
-        else:
-            st.warning("추천을 받기 위해서는 책을 하나 이상 선택해주세요.")
-
     # 책 등록하기 버튼
     if st.button('책 등록하기', use_container_width=True):
         st.session_state.page = 'pic_upload'
@@ -89,6 +76,24 @@ def app():
             st.rerun()
         else:
             st.warning("삭제할 책을 선택해주세요.")
+    
+    st.write(" ")
+    st.write(" ")
+    st.write(" ")
+
+    # MMR 파라미터
+    st.subheader("얼마나 새로운 책을 만나고 싶으세요?")
+    mmr_alpha = st.slider("숫자가 클수록 다양한 종류의 책을 만날 수 있어요.", min_value=0, max_value=10, value=5, step=1)
+    st.session_state.mmr_alpha = 1-(mmr_alpha/20)
+
+    # 추천받기 버튼 클릭 시 recommend_book 페이지로 이동
+    if st.button('추천받기', use_container_width=True):
+        if st.session_state.selected_books:
+            st.session_state.page = 'recommend_book'
+            st.rerun()  # 페이지 이동
+        else:
+            st.warning("추천을 받기 위해서는 책을 하나 이상 선택해주세요.")
+
 
 # Streamlit app execution
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ from dotenv import load_dotenv, find_dotenv
 
 
 class Recsys:
-    def __init__(self, df_path, tfidf_matrix_path, replace_books_path=r'D:\python_project\chaekchecklab\data\replace_books.csv') -> None:
+    def __init__(self, df_path, tfidf_matrix_path, replace_books_path=r'replace_books.csv') -> None:
 
         def get_db_connection():
             return pymysql.connect(

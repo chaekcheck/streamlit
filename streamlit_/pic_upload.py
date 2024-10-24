@@ -7,7 +7,7 @@ def app():
     st.caption("보유한 책을 온라인 서재에 등록하세요.")
 
     # Image input box
-    uploaded_pic = st.file_uploader("책 사진을 업로드하세요", type=["jpg", "png", "jpeg"])
+    uploaded_pic = st.file_uploader("책 사진을 업로드하세요.", type=["jpg", "png", "jpeg"])
 
     # 업로드한 책 목록
     # if uploaded_pic is not None:
@@ -20,7 +20,7 @@ def app():
     with st.expander("이미지 업로드 가이드"):
         st.markdown('''책장 한 칸의 이미지를
                     \n흔들리지 않게 찍어주세요.
-                    \n글자가 크고 선명할수록 좋아요
+                    \n글자가 크고 선명할수록 좋아요.
                     \n*10권 이내 권장''')
 
     # OCR 결과 여기에 넣어야 됨! (임시 데이터)

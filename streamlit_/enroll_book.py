@@ -88,7 +88,7 @@ def app():
         st.session_state.missing_books = []
         st.session_state.message = ''
     elif st.session_state.message == 'no':
-        st.info('없는 책은 제외하고 책 등록이 완료되었습니다.')
+        st.info('찾을 수 없는 책은 제외하고 책 등록이 완료되었습니다.')
         st.session_state.message = ''
 
     if st.button('나의 서재 확인하기', use_container_width=True):
